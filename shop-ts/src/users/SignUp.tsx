@@ -3,6 +3,7 @@ import type { SignUpForm } from "../types/user";
 import { useUser } from "../context/UserContext";
 import { useNavigate } from "react-router-dom";
 
+// Form initialization
 const initialForm: SignUpForm = {
     username: "",
     password: "",
@@ -11,10 +12,14 @@ const initialForm: SignUpForm = {
     email: ""
 }
 
+// Input validation
+const USERNAME_REGEX = /^(?=.*[a-z])(?=.*\d)[a-z0-9]{4,12}$/
+const EMAIL_REGEX = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
+
 const SignUp = () => {
     const [form, setForm] = useState<SignUpForm>(initialForm);
     const [error, setError] = useState<string | null>(null);
-    const { signup } = useUser();  //Context API의 사용자 훅 사용
+    const { signup, users } = useUser();  //Context API의 사용자 훅 사용
 
     // 폼에 입력된 데이터 가져오기
     const { username, password, passwordConfirm, name, email } = form;
@@ -31,12 +36,16 @@ const SignUp = () => {
         e.preventDefault();  //기본 동작 막기
 
         // 유효성 검사
-        if(!username){
-            setError("아이디를 입력하세요");
+        if(!USERNAME_REGEX.test(username)){
+            setError("아이디를 영문 소문자와 숫자 포함 4~12자로 작성해주세요.");
             return;
         }
-        if(!password){
-            setError("비밀번호를 입력하세요");
+        if(users.some(user => user.username === username)){
+            setError("이미 사용 중인 아이디입니다.")
+            return;
+        }
+        if(password.length < 8){
+            setError("비밀번호는 8자리 이상으로 입력해주세요");
             return;
         }
         if(password !== passwordConfirm){
@@ -47,8 +56,8 @@ const SignUp = () => {
             setError("이름을 입력하세요");
             return;
         }
-        if(!email){
-            setError("이메일 입력하세요");
+        if(!EMAIL_REGEX.test(email.trim())){
+            setError("이메일 형식이 올바르지 않습니다.");
             return;
         }
 
@@ -76,7 +85,7 @@ const SignUp = () => {
                         name="username"
                         value={username}
                         onChange={handleInputChange}
-                        placeholder="아이디를 입력해주세요"
+                        placeholder="아이디를 영문 소문자와 숫자 포함 4~12자로 입력해주세요."
                     />
                 </div>
                 <div>

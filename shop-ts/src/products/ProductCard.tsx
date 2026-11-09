@@ -5,9 +5,15 @@ import { useCart } from "../context/CartContext";
 
 const ProductCard = ({product}: {product: Product}) => {
     const { addToCart } = useCart();
-
+    const NO_IMAGE = "/images/no-image.png"
     return(
         <div className="product-card"> 
+        <Link to={`/product/${product.id}`}>
+            <img 
+                className="product-card_img"
+                src={product.image ?? NO_IMAGE} 
+                alt={product.pName} />
+        </Link>
             <span>{product.category}</span>
             <h3>
               <Link to={`/product/${product.id}`}>{product.pName}</Link>
